@@ -19,14 +19,13 @@ This is a licence-free software, it can be used by anyone who try to build a bet
 #ifndef SERIALIB_H
 #define SERIALIB_H
 
-
-
 // Used for TimeOut operations
-#include <sys/time.h>
+//#include <sys/time.h>
 // Include for windows
 #if defined (_WIN32) || defined (_WIN64)
     // Accessing to the serial port under Windows
     #include <windows.h>
+    #define WINDOWS 1
 #endif
 
 // Include for Linux
@@ -234,7 +233,6 @@ private:
 class timeOut
 {
 public:
-
     // Constructor
     timeOut();
 
@@ -244,9 +242,22 @@ public:
     // Return the elapsed time since initialization
     unsigned long int   elapsedTime_ms();
 
-private:
-    // Used to store the previous time (for computing timeout)
-    struct timeval      previousTime;
+    #ifdef WINDOWS
+        private:
+        // Used to store the previous time (for computing timeout)
+            ULARGE_INTEGER      previousTime;
+        private:
+        // Helper function to get the performance counter frequency
+            static ULONGLONG frequency(){
+                LARGE_INTEGER freq;
+                QueryPerformanceFrequency(&freq);
+                return freq.QuadPart;
+            }
+    #else
+        private:
+        // Used to store the previous time (for computing timeout)
+            struct timeval      previousTime;
+    #endif
 };
 
 #endif // serialib_H

@@ -29,7 +29,7 @@
 
 // Serial library
 #include "serialib.h"
-#include <unistd.h>
+//#include <unistd.h>
 #include <stdio.h>
 
 
@@ -56,7 +56,7 @@ int main( /*int argc, char *argv[]*/)
 
 
     // If connection fails, return the error code otherwise, display a success message
-    if (errorOpening!=1) return errorOpening;
+    if (errorOpening!=1) printf("Connection failed to %s\n",SERIAL_PORT); return errorOpening;
     printf ("Successful connection to %s\n",SERIAL_PORT);
 
 
