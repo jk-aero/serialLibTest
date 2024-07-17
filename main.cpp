@@ -26,12 +26,9 @@
  * @see https://lucidar.me
  */
 
-
 // Serial library
 #include "serialib.h"
-//#include <unistd.h>
 #include <iostream>
-
 
 #if defined (_WIN32) || defined(_WIN64)
     //for serial ports above "COM9", we must use this extended syntax of "\\.\COMx".
@@ -40,6 +37,7 @@
     #define SERIAL_PORT "\\\\.\\COM1"
 #endif
 #if defined (__linux__) || defined(__APPLE__)
+    #include <unistd.h>
     #define SERIAL_PORT "/dev/ttyACM0"
 #endif
 
