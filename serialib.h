@@ -19,8 +19,6 @@ This is a licence-free software, it can be used by anyone who try to build a bet
 #ifndef SERIALIB_H
 #define SERIALIB_H
 
-// Used for TimeOut operations
-//#include <sys/time.h>
 // Include for windows
 #if defined (_WIN32) || defined (_WIN64)
     // Accessing to the serial port under Windows
@@ -40,6 +38,8 @@ This is a licence-free software, it can be used by anyone who try to build a bet
     #include <fcntl.h>
     #include <unistd.h>
     #include <sys/ioctl.h>
+    // Used for TimeOut operations
+    #include <sys/time.h>
 #endif
 
 
