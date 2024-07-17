@@ -17,8 +17,6 @@ This is a licence-free software, it can be used by anyone who try to build a bet
 
 #include "serialib.h"
 
-
-
 //_____________________________________
 // ::: Constructors and destructors :::
 
@@ -892,9 +890,6 @@ bool serialib::isDSR()
 
 
 
-
-
-
 /*!
     \brief      Get the DCD's status (pin 1)
                 CDC stands for Data Carrier Detect
@@ -980,9 +975,6 @@ bool serialib::isRTS()
 
 
 
-
-
-
 // ******************************************
 //  Class timeOut
 // ******************************************
@@ -995,48 +987,64 @@ bool serialib::isRTS()
 timeOut::timeOut()
 {}
 
-
 /*!
     \brief      Initialise the timer. It writes the current time of the day in the structure PreviousTime.
 */
 //Initialize the timer
 void timeOut::initTimer()
-{
-    gettimeofday(&previousTime, NULL);
+{  
+    #ifdef WINDOWS
+        LARGE_INTEGER li;
+        QueryPerformanceCounter(&li);
+        previousTime.QuadPart = li.QuadPart;
+    #else
+        gettimeofday(&previousTime, NULL);
+    #endif
 }
 
 /*!
     \brief      Returns the time elapsed since initialization.  It write the current time of the day in the structure CurrentTime.
-                Then it returns the difference between CurrentTime and PreviousTime.
+                    Then it returns the difference between CurrentTime and PreviousTime.
     \return     The number of microseconds elapsed since the functions InitTimer was called.
-  */
+*/
 //Return the elapsed time since initialization
 unsigned long int timeOut::elapsedTime_ms()
 {
-    // Current time
-    struct timeval CurrentTime;
-    // Number of seconds and microseconds since last call
-    int sec,usec;
+    #ifdef WINDOWS
+        // Current time
+        LARGE_INTEGER currentTime;
+        QueryPerformanceCounter(&currentTime);
 
-    // Get current time
-    gettimeofday(&CurrentTime, NULL);
+        // Calculate elapsed time in microseconds
+        ULONGLONG elapsedTimeMicro = (currentTime.QuadPart - previousTime.QuadPart) * 1000000 / frequency();
 
-    // Compute the number of seconds and microseconds elapsed since last call
-    sec=CurrentTime.tv_sec-previousTime.tv_sec;
-    usec=CurrentTime.tv_usec-previousTime.tv_usec;
+        // Update previous time
+        previousTime.QuadPart = currentTime.QuadPart;
 
-    // If the previous usec is higher than the current one
-    if (usec<0)
-    {
-        // Recompute the microseonds and substract one second
-        usec=1000000-previousTime.tv_usec+CurrentTime.tv_usec;
-        sec--;
-    }
+        // Return elapsed time in milliseconds
+        return static_cast<unsigned long int>(elapsedTimeMicro / 1000);
+    #else
+        // Current time
+        struct timeval CurrentTime;
+        // Number of seconds and microseconds since last call
+        int sec,usec;
 
-    // Return the elapsed time in milliseconds
-    return sec*1000+usec/1000;
+        // Get current time
+        gettimeofday(&CurrentTime, NULL);
+
+        // Compute the number of seconds and microseconds elapsed since last call
+        sec=CurrentTime.tv_sec-previousTime.tv_sec;
+        usec=CurrentTime.tv_usec-previousTime.tv_usec;
+
+        // If the previous usec is higher than the current one
+        if (usec<0)
+        {
+            // Recompute the microseonds and substract one second
+            usec=1000000-previousTime.tv_usec+CurrentTime.tv_usec;
+            sec--;
+        }
+
+        // Return the elapsed time in milliseconds
+        return sec*1000+usec/1000;
+    #endif
 }
-
-
-
-
