@@ -26,12 +26,9 @@
  * @see https://lucidar.me
  */
 
-
 // Serial library
 #include "serialib.h"
-#include <unistd.h>
-#include <stdio.h>
-
+#include <iostream>
 
 #if defined (_WIN32) || defined(_WIN64)
     //for serial ports above "COM9", we must use this extended syntax of "\\.\COMx".
@@ -40,6 +37,7 @@
     #define SERIAL_PORT "\\\\.\\COM1"
 #endif
 #if defined (__linux__) || defined(__APPLE__)
+    #include <unistd.h>
     #define SERIAL_PORT "/dev/ttyACM0"
 #endif
 
@@ -56,7 +54,10 @@ int main( /*int argc, char *argv[]*/)
 
 
     // If connection fails, return the error code otherwise, display a success message
-    if (errorOpening!=1) return errorOpening;
+    if (errorOpening!=1){
+        printf("Connection failed to %s\n",SERIAL_PORT);
+        return errorOpening;
+    }
     printf ("Successful connection to %s\n",SERIAL_PORT);
 
 
@@ -73,6 +74,8 @@ int main( /*int argc, char *argv[]*/)
 
     // Close the serial device
     serial.closeDevice();
-
+    
+    std::cin.get();
+    
     return 0 ;
 }
